@@ -7,39 +7,37 @@ import {
   Button,
   FlatList
 } from "react-native";
+import { GoalItems } from "./components/GoalItems";
+import { GoalInputs } from "./components/GoalInputs";
 
 export default function App() {
-  const [enteredGoal, setEnteredGoal] = useState("");
   const [courseGoals, setCourseGoals] = useState([]);
 
-  const goalInputHandler = enteredText => {
-    setEnteredGoal(enteredText);
-  };
-
-  const courseGoalsHandler = () => {
+  const courseGoalsHandler = enteredGoal => {
     setCourseGoals(currentGoals => [
       ...currentGoals,
       { id: Math.random().toString(), value: enteredGoal }
     ]);
   };
 
+  const removeGoalHandler = goalId => {
+    setCourseGoals(currentGoals => {
+      return currentGoals.filter(goal => goal.id !== goalId);
+    });
+  };
+
   return (
     <View style={styles.screen}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Course Goal"
-          style={styles.input}
-          onChangeText={goalInputHandler}
-        />
-        <Button title="ADD" onPress={courseGoalsHandler} />
-      </View>
+      <GoalInputs courseGoalsHandler={courseGoalsHandler} />
       <FlatList
         keyExtractor={(item, index) => item.id}
         data={courseGoals}
         renderItem={itemData => (
-          <View style={styles.listItem}>
-            <Text>{itemData.item.value}</Text>
-          </View>
+          <GoalItems
+            onDelete={removeGoalHandler}
+            id={itemData.item.id}
+            title={itemData.item.value}
+          />
         )}
       />
     </View>
@@ -47,23 +45,5 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  screen: { padding: 50 },
-  inputContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  input: {
-    width: "80%",
-    borderColor: "black",
-    borderWidth: 1,
-    padding: 10
-  },
-  listItem: {
-    padding: 10,
-    marginVertical: 10,
-    backgroundColor: "#ccc",
-    borderColor: "black",
-    borderWidth: 1
-  }
+  screen: { padding: 50 }
 });
